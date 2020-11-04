@@ -85,6 +85,25 @@
                     border-top-right-radius: 5px;
                     border-top-left-radius: 5px;
                 }
+                ul.subscription-control{
+                    list-style: none;
+                }
+                div.flex-container {
+                    display: flex;
+                }
+                
+                div.flex-child {
+                    flex: 1;
+                    border: 2px solid yellow;
+                }  
+                
+                div.flex-child:first-child {
+                    margin-right: 20px;
+                }
+                
+                div.actual-amount{
+                    font-size: 24px;
+                }
             }
         }
 

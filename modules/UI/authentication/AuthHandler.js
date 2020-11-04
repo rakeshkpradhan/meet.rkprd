@@ -10,6 +10,7 @@ import {
 import UIUtil from '../util/UIUtil';
 
 import LoginDialog from './LoginDialog';
+import SubscriptionHandler from '../subscription/SubscriptionHandler';
 
 const logger = Logger.getLogger(__filename);
 
@@ -162,8 +163,10 @@ function initJWTTokenListener(room) {
  * @param {string} [lockPassword] password to use if the conference is locked
  */
 function doXmppAuth(room, lockPassword) {
+    //SubscriptionHandler.showHideSubscription('biswajit769@gmail.com');
     const loginDialog = LoginDialog.showAuthDialog(
         /* successCallback */ (id, password) => {
+            console.log("success callback method===",id," and password===",password);
             room.authenticateAndUpgradeRole({
                 id,
                 password,
@@ -180,6 +183,7 @@ function doXmppAuth(room, lockPassword) {
                     loginDialog.displayConnectionStatus(
                         'connection.GOT_SESSION_ID');
                     loginDialog.close();
+                    SubscriptionHandler.showHideSubscription(id,room);
                 },
                 /* onRejected */ error => {
                     logger.error('authenticateAndUpgradeRole failed', error);
