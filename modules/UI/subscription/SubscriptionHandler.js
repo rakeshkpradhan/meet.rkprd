@@ -37,7 +37,6 @@ planLog[365] = {
 }
 
 let header = new Headers({
-    'Access-Control-Allow-Origin':'*',
     'Content-Type': 'application/json'
 });
 
@@ -151,7 +150,7 @@ function showHideSubscription(emailId,room){
                         verifyOrderStatus(emailId,checkoutstatus,selectedplan)
                         .then(isValidOrder => {
                             if(isValidOrder.status === 'Success'){
-                                const subscriptionSuccessDialog = SubscriptionDialog.showSubscriptionSuccessDialog((response) =>{
+                                const subscriptionSuccessDialog = SubscriptionDialog.showSubscriptionSuccessDialog(isValidOrder.expiry,(response) =>{
                                     subscriptionDialog.close();
                                 },() => subscriptionSuccessDialog.close())
                             }else{
@@ -168,7 +167,19 @@ function showHideSubscription(emailId,room){
                     });
                 })
                 //subscriptionDialog.close();
-            },() => subscriptionDialog.close())
+            },() => {
+                subscriptionDialog.close()
+                const subscriptionCancelDialog = SubscriptionDialog.showSubscriptionCancelDialog((response) =>{
+                    subscriptionCancelDialog.close();
+                    AuthHandler.logout(room).then(url => {
+                        if (url) {
+                            UIUtil.redirect(url);
+                        }else{
+                            UIUtil.redirect('/');
+                        } 
+                    });
+                },() => subscriptionCancelDialog.close())
+            })
         }
     })
     .catch(err => console.log(err));

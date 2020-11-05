@@ -5,6 +5,8 @@ import {
     JitsiConnectionErrors
 } from '../../../react/features/base/lib-jitsi-meet';
 
+import moment from 'moment';
+
 
 
 /**
@@ -41,9 +43,20 @@ function getSubscriptionBoxInputHtml(){
  * Build html for "password required" dialog.
  * @returns {string} html string
  */
-function subscriptionSuccess() {
+function subscriptionSuccess(expiry) {
+    const formattedDate = moment(expiry).format('DD/MM/YYYY');
     return `
-    <p>Your subscription is successful!</p>`;
+    <p>Your subscription is successful!</p><p>Valid until: ${formattedDate}</p>`;
+}
+
+
+/**
+ * Build html for "password required" dialog.
+ * @returns {string} html string
+ */
+function subscriptionCancelSuccess() {
+    return `
+    <p>Please subscribe plans for using the service</p>`;
 }
 
 
@@ -60,12 +73,12 @@ function subscriptionSuccess() {
  * @param {function} [cancelCallback] callback to invoke if user canceled.
  */
 function SubscriptionDialog(successCallback, cancelCallback) {
-    const subscriptionButtons = [ {
+    const subscriptionButtons_back = [ {
         title: APP.translation.generateTranslationHTML('dialog.Ok'),
         value: true
     }];
 
-    const cancelButtons = [ {
+    const subscriptionButtons = [ {
         title: APP.translation.generateTranslationHTML('dialog.Ok'),
         value: true
     } ,{
@@ -125,7 +138,7 @@ function SubscriptionDialog(successCallback, cancelCallback) {
  * @param {function(jid, password)} successCallback
  * @param {function} [cancelCallback] callback to invoke if user canceled.
  */
-function SubscriptionSuccessDialog(successCallback, cancelCallback) {
+function SubscriptionSuccessDialog(expirydate,successCallback, cancelCallback) {
     const subscriptionSuccessButtons = [ {
         title: APP.translation.generateTranslationHTML('dialog.Ok'),
         value: true
@@ -134,7 +147,7 @@ function SubscriptionSuccessDialog(successCallback, cancelCallback) {
     const states = {
         subscribed: {
             buttons: subscriptionSuccessButtons,
-            html: subscriptionSuccess(),
+            html: subscriptionSuccess(expirydate),
             titleKey: 'dialog.subscriptionSuccess',
 
             submit(e, v, m, f) { // eslint-disable-line max-params
@@ -167,11 +180,68 @@ function SubscriptionSuccessDialog(successCallback, cancelCallback) {
     };
 }
 
+
+/**
+ * Auth dialog for JitsiConnection which supports retries.
+ * If no cancelCallback provided then there will be
+ * no cancel button on the dialog.
+ *
+ * @class LoginDialog
+ * @constructor
+ *
+ * @param {function(jid, password)} successCallback
+ * @param {function} [cancelCallback] callback to invoke if user canceled.
+ */
+function SubscriptionCancelDialog(successCallback, cancelCallback) {
+    const subscriptionCancelButtons = [ {
+        title: APP.translation.generateTranslationHTML('dialog.Ok'),
+        value: true
+    }];
+
+    const states = {
+        subscribed: {
+            buttons: subscriptionCancelButtons,
+            html: subscriptionCancelSuccess(),
+            titleKey: 'dialog.subscriptionRequired',
+
+            submit(e, v, m, f) { // eslint-disable-line max-params
+                e.preventDefault();
+                if (v) {
+                    successCallback('success');
+                    connCancelDialogSubscription.close();
+                } else {
+                    // User cancelled
+                    cancelCallback();
+                }
+            }
+        },
+    };
+    const connCancelDialogSubscription = APP.UI.messageHandler.openDialogWithStates(
+        states,
+        {
+            closeText: '',
+            persistent: true,
+            zIndex: 1020
+        },
+        null
+    );
+    
+    /**
+     * Closes LoginDialog.
+     */
+    this.close = function() {
+        connCancelDialogSubscription.close();
+    };
+}
+
 export default {
     showSubscriptionDialog(successCallback, cancelCallback) {
         return new SubscriptionDialog(successCallback, cancelCallback);
     },
     showSubscriptionSuccessDialog(successCallback, cancelCallback) {
         return new SubscriptionSuccessDialog(successCallback, cancelCallback);
+    },
+    showSubscriptionCancelDialog(successCallback, cancelCallback) {
+        return new SubscriptionCancelDialog(successCallback, cancelCallback);
     }
 }

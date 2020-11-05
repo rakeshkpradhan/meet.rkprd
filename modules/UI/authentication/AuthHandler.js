@@ -163,7 +163,7 @@ function initJWTTokenListener(room) {
  * @param {string} [lockPassword] password to use if the conference is locked
  */
 function doXmppAuth(room, lockPassword) {
-    //SubscriptionHandler.showHideSubscription('biswajit769@gmail.com');
+    //SubscriptionHandler.showHideSubscription('biswajit769@gmail.com',room);
     const loginDialog = LoginDialog.showAuthDialog(
         /* successCallback */ (id, password) => {
             console.log("success callback method===",id," and password===",password);
