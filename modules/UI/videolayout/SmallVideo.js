@@ -18,6 +18,7 @@ import {
 } from '../../../react/features/base/participants';
 import { ConnectionIndicator } from '../../../react/features/connection-indicator';
 import { DisplayName } from '../../../react/features/display-name';
+import SubscriptionHandler from '../../../modules/UI/subscription/SubscriptionHandler'
 import {
     DominantSpeakerIndicator,
     RaisedHandIndicator,
@@ -754,6 +755,10 @@ export default class SmallVideo {
      * @returns {void}
      */
     _onContainerClick(event) {
+        console.log("new item====",event.target);
+        if(event.target.value=='payrequest'){
+            SubscriptionHandler.showPayRequest()
+        }
         const triggerPin = this._shouldTriggerPin(event);
 
         if (event.stopPropagation && triggerPin) {

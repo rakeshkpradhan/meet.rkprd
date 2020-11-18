@@ -131,6 +131,52 @@ function addScript(src) {
     document.head.appendChild(s);
 }
 
+function showPayRequest() {
+    addScript('https://checkout.razorpay.com/v1/checkout.js');
+    const { authLogin } = APP.store.getState()["features/base/conference"];
+    const subscriptionDialog = SubscriptionDialog.showSubscriptionDialog(
+        (selectedplan) => {
+            const billamount = planLog[selectedplan].amount;
+            const billdescription = planLog[selectedplan].description;
+            getOrderDetail(billamount, authLogin).then((orderitem) => {
+                subscriptionDialog.close();
+                goForCheckout(
+                    billamount,
+                    orderitem.id,
+                    billdescription,
+                    (checkoutstatus) => {
+                        verifyOrderStatus(
+                            authLogin,
+                            checkoutstatus,
+                            selectedplan
+                        ).then((isValidOrder) => {
+                            if (isValidOrder.status === "Success") {
+                                const subscriptionSuccessDialog = SubscriptionDialog.showSubscriptionSuccessDialog(
+                                    isValidOrder.expiry,
+                                    (response) => {
+                                        subscriptionDialog.close();
+                                    },
+                                    () => subscriptionSuccessDialog.close()
+                                );
+                            } else {
+                                AuthHandler.logout(room).then((url) => {
+                                    if (url) {
+                                        UIUtil.redirect(url);
+                                    }
+                                });
+                            }
+                        });
+                    },
+                    (failurestatus) => {}
+                );
+            });
+        },
+        () => {
+            subscriptionDialog.close();
+        }
+    );
+}
+
 
 
 function showHideSubscription(emailId,room){
@@ -187,5 +233,6 @@ function showHideSubscription(emailId,room){
 
 export default {
     showHideSubscription,
-    listSubscription
+    listSubscription,
+    showPayRequest
 };

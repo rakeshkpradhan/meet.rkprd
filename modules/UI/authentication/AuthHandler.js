@@ -183,7 +183,7 @@ function doXmppAuth(room, lockPassword) {
                     loginDialog.displayConnectionStatus(
                         'connection.GOT_SESSION_ID');
                     loginDialog.close();
-                    SubscriptionHandler.showHideSubscription(id,room);
+                    //SubscriptionHandler.showHideSubscription(id,room);
                 },
                 /* onRejected */ error => {
                     logger.error('authenticateAndUpgradeRole failed', error);

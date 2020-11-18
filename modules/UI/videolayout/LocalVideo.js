@@ -37,7 +37,7 @@ export default class LocalVideo extends SmallVideo {
         this.isLocal = true;
         this._setThumbnailSize();
         this.updateDOMLocation();
-
+        
         this.localVideoId = null;
         this.bindHoverHandler();
         if (!config.disableLocalVideoFlip) {
@@ -63,6 +63,7 @@ export default class LocalVideo extends SmallVideo {
 
         this.addAudioLevelIndicator();
         this.updateIndicators();
+        //this.removePayIndicator()
 
         this.container.onclick = this._onContainerClick;
     }
@@ -86,6 +87,11 @@ export default class LocalVideo extends SmallVideo {
             <div class = 'avatar-container'></div>`;
 
         return containerSpan;
+    }
+
+    _setPayButton(){
+        console.log("container===",$(this.container).children('.videocontainer__toolbar').children('.statusindicator'));
+        //this.$container.find(".paybutton-container").remove();
     }
 
     /**

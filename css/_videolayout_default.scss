@@ -346,6 +346,30 @@
     margin: 0px 5px 0px 0px;
 }
 
+.videocontainer .toolbar-icon.paynow {
+    width:70px;
+}
+
+.videocontainer .toolbar-icon.paynow .jitsi-icon{
+    width:53px;
+}
+
+.videocontainer .toolbar-icon.paynow button {
+    border: 0;
+    background: none;
+    /* margin-bottom: 10px; */
+    /* height: 26px; */
+    padding: 0;
+    /* padding-left: 5px; */
+    /* padding-right: 5px; */
+    /* padding-bottom: 20px; */
+    /* position: relative; */
+    /* margin-bottom: 10px; */
+    /* line-height: 29px; */
+    /* display: inline-flex; */
+    /* vertical-align: top;*/
+}
+
 /**
  * Toolbar icon internal i elements (font icons).
  */

@@ -1,14 +1,21 @@
 /* @flow */
 
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
-import { getLocalParticipant, getParticipantById, PARTICIPANT_ROLE } from '../../../base/participants';
-import { connect } from '../../../base/redux';
-import { getCurrentLayout, LAYOUTS } from '../../../video-layout';
+import {
+    getLocalParticipant,
+    getParticipantById,
+    PARTICIPANT_ROLE,
+} from "../../../base/participants";
+import { connect } from "../../../base/redux";
+import { getCurrentLayout, LAYOUTS } from "../../../video-layout";
 
-import AudioMutedIndicator from './AudioMutedIndicator';
-import ModeratorIndicator from './ModeratorIndicator';
-import VideoMutedIndicator from './VideoMutedIndicator';
+import AudioMutedIndicator from "./AudioMutedIndicator";
+import ModeratorIndicator from "./ModeratorIndicator";
+import VideoMutedIndicator from "./VideoMutedIndicator";
+import PayIndicator from "./PayIndicator";
+
+console.log("check time===",getLocalParticipant);
 
 declare var interfaceConfig: Object;
 
@@ -16,7 +23,6 @@ declare var interfaceConfig: Object;
  * The type of the React {@code Component} props of {@link StatusIndicators}.
  */
 type Props = {
-
     /**
      * The current layout of the filmstrip.
      */
@@ -26,6 +32,11 @@ type Props = {
      * Indicates if the moderator indicator should be visible or not.
      */
     _showModeratorIndicator: Boolean,
+
+    /**
+     * Indicates if the moderator indicator should be visible or not.
+     */
+    _showModeratorPayButton: Boolean,
 
     /**
      * Indicates if the audio muted indicator should be visible or not.
@@ -40,7 +51,7 @@ type Props = {
     /**
      * The ID of the participant for which the status bar is rendered.
      */
-    participantID: String
+    participantID: String,
 };
 
 /**
@@ -59,27 +70,38 @@ class StatusIndicators extends Component<Props> {
         const {
             _currentLayout,
             _showModeratorIndicator,
+            _showModeratorPayButton,
             showAudioMutedIndicator,
-            showVideoMutedIndicator
+            showVideoMutedIndicator,
         } = this.props;
+
         let tooltipPosition;
 
         switch (_currentLayout) {
-        case LAYOUTS.TILE_VIEW:
-            tooltipPosition = 'right';
-            break;
-        case LAYOUTS.VERTICAL_FILMSTRIP_VIEW:
-            tooltipPosition = 'left';
-            break;
-        default:
-            tooltipPosition = 'top';
+            case LAYOUTS.TILE_VIEW:
+                tooltipPosition = "right";
+                break;
+            case LAYOUTS.VERTICAL_FILMSTRIP_VIEW:
+                tooltipPosition = "left";
+                break;
+            default:
+                tooltipPosition = "top";
         }
 
         return (
-            <div>
-                { showAudioMutedIndicator ? <AudioMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
-                { showVideoMutedIndicator ? <VideoMutedIndicator tooltipPosition = { tooltipPosition } /> : null }
-                { _showModeratorIndicator ? <ModeratorIndicator tooltipPosition = { tooltipPosition } /> : null }
+            <div className="statusindicator">
+                {showAudioMutedIndicator ? (
+                    <AudioMutedIndicator tooltipPosition={tooltipPosition} />
+                ) : null}
+                {showVideoMutedIndicator ? (
+                    <VideoMutedIndicator tooltipPosition={tooltipPosition} />
+                ) : null}
+                {_showModeratorIndicator ? (
+                    <ModeratorIndicator tooltipPosition={tooltipPosition} />
+                ) : null}
+                {_showModeratorPayButton ? (
+                    <PayIndicator tooltipPosition={tooltipPosition} />
+                ) : null}
             </div>
         );
     }
@@ -95,17 +117,25 @@ class StatusIndicators extends Component<Props> {
  *     _currentLayout: string,
  *     _showModeratorIndicator: boolean
  * }}
-*/
+ */
 function _mapStateToProps(state, ownProps) {
     const { participantID } = ownProps;
 
     // Only the local participant won't have id for the time when the conference is not yet joined.
-    const participant = participantID ? getParticipantById(state, participantID) : getLocalParticipant(state);
+    const participant = participantID
+        ? getParticipantById(state, participantID)
+        : getLocalParticipant(state);
 
     return {
         _currentLayout: getCurrentLayout(state),
         _showModeratorIndicator:
-            !interfaceConfig.DISABLE_FOCUS_INDICATOR && participant && participant.role === PARTICIPANT_ROLE.MODERATOR
+            !interfaceConfig.DISABLE_FOCUS_INDICATOR &&
+            participant &&
+            participant.role === PARTICIPANT_ROLE.MODERATOR,
+        _showModeratorPayButton:
+            !interfaceConfig.DISABLE_FOCUS_INDICATOR &&
+            participant &&
+            participant.role === PARTICIPANT_ROLE.MODERATOR && participant.local == false,
     };
 }
 
