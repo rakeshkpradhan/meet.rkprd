@@ -133,12 +133,16 @@ function addScript(src) {
 
 function showPayRequest() {
     addScript('https://checkout.razorpay.com/v1/checkout.js');
+    let userEmail = 'biswajitr@meet.rkprd.com';
     const { authLogin } = APP.store.getState()["features/base/conference"];
+    if(authLogin && authLogin !== undefined){
+        userEmail = authLogin;
+    }
     const subscriptionDialog = SubscriptionDialog.showSubscriptionDialog(
         (selectedplan) => {
             const billamount = planLog[selectedplan].amount;
             const billdescription = planLog[selectedplan].description;
-            getOrderDetail(billamount, authLogin).then((orderitem) => {
+            getOrderDetail(billamount, userEmail).then((orderitem) => {
                 subscriptionDialog.close();
                 goForCheckout(
                     billamount,
@@ -146,7 +150,7 @@ function showPayRequest() {
                     billdescription,
                     (checkoutstatus) => {
                         verifyOrderStatus(
-                            authLogin,
+                            userEmail,
                             checkoutstatus,
                             selectedplan
                         ).then((isValidOrder) => {
